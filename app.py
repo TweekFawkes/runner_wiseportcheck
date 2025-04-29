@@ -42,14 +42,21 @@ def main():
                     if banner:
                         print(f"## Received Banner:\n{banner.decode(errors='ignore')}")
                     else:
-                        print("[-] No banner received immediately. Assuming HTTP or similar service.")
-                        # Send HTTP GET request
-                        http_get = f"GET / HTTP/1.1\r\nHost: {ip_address}\r\nConnection: close\r\n\r\n".encode()
-                        print(f"[*] Sending HTTP GET request...")
+                        # This case (empty banner immediately) is less common than a timeout
+                        print("[-] Connection closed immediately by server without banner.")
+                        
+                except socket.timeout:
+                    print("[-] No banner received immediately. Assuming HTTP or similar service.")
+                    # Send HTTP GET request
+                    http_get = f"GET / HTTP/1.1\r\nHost: {ip_address}\r\nConnection: close\r\n\r\n".encode()
+                    print(f"[*] Sending HTTP GET request...")
+                    try: # Nested try for sending/receiving HTTP
                         sock.sendall(http_get)
                     
                         # Receive response
                         response = b""
+                        # Set a longer timeout for receiving HTTP response
+                        sock.settimeout(10) 
                         while True:
                             try:
                                 chunk = sock.recv(4096)
@@ -57,15 +64,22 @@ def main():
                                     break
                                 response += chunk
                             except socket.timeout:
+                                print("[-] Timed out waiting for HTTP response.")
                                 break # Stop receiving if timeout occurs
+                            except socket.error as e:
+                                print(f"[!] Socket error receiving HTTP response: {e}")
+                                break
                         if response:
                             print(f"## Received Response:\n{response.decode(errors='ignore')}")
                         else:
                             print("[-] No response received after GET request.")
-                except socket.timeout:
-                    print("[-] Timed out waiting for banner/response. Service might not send data proactively.")
+                    except socket.error as e:
+                        print(f"[!] Error sending HTTP GET request: {e}")
+                    except Exception as e:
+                         print(f"[!] Unexpected error during HTTP communication: {e}")
+
                 except Exception as e:
-                    print(f"[!] Error during banner grab/HTTP request: {e}")
+                    print(f"[!] Error during banner grab: {e}")
         
             except socket.timeout:
                 print(f"[-] Connection to {ip_address}:{tcp_port} timed out.")
