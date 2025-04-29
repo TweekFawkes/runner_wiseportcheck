@@ -61,9 +61,9 @@ def main():
                         "",  # Empty line before final CRLF
                         ""   # Final CRLF
                     ]
-                    http_get = "\\r\\n".join(http_request_lines).encode()
+                    http_get = "\r\n".join(http_request_lines).encode()
                     print(f"[*] Sending HTTP GET request...")
-                    print(f"\\n--- Request ---\\n{http_get.decode()}\\n---------------") # Print the request
+                    print(f"\n--- Request ---\n{http_get.decode()}\n---------------") # Print the request
                     try: # Nested try for sending/receiving HTTP
                         sock.sendall(http_get)
                     
