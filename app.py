@@ -2,6 +2,10 @@ import argparse
 
 ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ###
 
+user_agent = "CCBot/2.0"
+
+### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ###
+
 try:
     import socket
 except ImportError:
@@ -48,9 +52,18 @@ def main():
                 except socket.timeout:
                     print("[-] No banner received immediately. Assuming HTTP or similar service.")
                     # Send HTTP GET request
-                    http_get = f"GET / HTTP/1.1\\r\\nHost: {ip_address}\\r\\nConnection: close\\r\\n\\r\\n".encode()
+                    http_request_lines = [
+                        f"GET / HTTP/1.1",
+                        f"Host: {ip_address}",
+                        f"User-Agent: {user_agent}",
+                        "Accept: */*",
+                        "Connection: close",
+                        "",  # Empty line before final CRLF
+                        ""   # Final CRLF
+                    ]
+                    http_get = "\\r\\n".join(http_request_lines).encode()
                     print(f"[*] Sending HTTP GET request...")
-                    print(f"\n--- Request ---\n{http_get.decode()}\n---------------") # Print the request
+                    print(f"\\n--- Request ---\\n{http_get.decode()}\\n---------------") # Print the request
                     try: # Nested try for sending/receiving HTTP
                         sock.sendall(http_get)
                     
