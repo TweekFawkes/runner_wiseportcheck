@@ -13,9 +13,9 @@ webform:
   - name: ip_address
     prompt: IP Address
     type: text
-  - name: tcp_port
-    prompt: TCP Port
+  - name: tcp_ports
+    prompt: TCP Ports, comma separated (e.g. 80,443,22)
     type: text
 
 launch:
-  command: app.py --ip_address ${ip_address} --tcp_port ${tcp_port}
+  command: app.py --ip_address ${ip_address} --tcp_ports ${tcp_ports}
