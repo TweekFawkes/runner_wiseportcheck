@@ -71,7 +71,11 @@ def main():
                                 print(f"[!] Socket error receiving HTTP response: {e}")
                                 break
                         if response:
-                            print(f"## Received Response:\n{response.decode(errors='ignore')}")
+                            decoded_response = response.decode(errors='ignore')
+                            if len(decoded_response) > 10000:
+                                print(f"## Received Response (truncated to 10000 chars):\n{decoded_response[:10000]}...")
+                            else:
+                                print(f"## Received Response:\n{decoded_response}")
                         else:
                             print("[-] No response received after GET request.")
                     except socket.error as e:
