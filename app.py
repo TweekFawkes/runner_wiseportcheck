@@ -48,8 +48,9 @@ def main():
                 except socket.timeout:
                     print("[-] No banner received immediately. Assuming HTTP or similar service.")
                     # Send HTTP GET request
-                    http_get = f"GET / HTTP/1.1\r\nHost: {ip_address}\r\nConnection: close\r\n\r\n".encode()
+                    http_get = f"GET / HTTP/1.1\\r\\nHost: {ip_address}\\r\\nConnection: close\\r\\n\\r\\n".encode()
                     print(f"[*] Sending HTTP GET request...")
+                    print(f"\n--- Request ---\n{http_get.decode()}\n---------------") # Print the request
                     try: # Nested try for sending/receiving HTTP
                         sock.sendall(http_get)
                     
